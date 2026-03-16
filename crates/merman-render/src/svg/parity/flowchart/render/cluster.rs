@@ -3,7 +3,9 @@
 use super::super::*;
 use super::root::flowchart_wrap_svg_text_lines;
 
-const FLOWCHART_CLUSTER_TITLE_WRAP_WIDTH: f64 = 200.0;
+/// Subgraph titles should never wrap. Use a very large width to disable wrapping.
+/// Original mermaid hardcodes 200px here which breaks long titles.
+const FLOWCHART_CLUSTER_TITLE_WRAP_WIDTH: f64 = 9999.0;
 
 pub(in crate::svg::parity) fn render_flowchart_cluster(
     out: &mut String,
