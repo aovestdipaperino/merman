@@ -742,8 +742,10 @@ fn layout_flowchart_v2_with_model(
     let edge_label_wrapping_width = 200.0;
     // Mermaid@11.12.2 renders subgraph titles via the `createText(...)` path and applies a default
     // wrapping width of 200px (even when `labelType=text` and `htmlLabels=false`), which results
-    // in `<tspan>`-wrapped titles for long words. Match that behavior in headless metrics.
-    let cluster_title_wrapping_width = 200.0;
+    // in `<tspan>`-wrapped titles for long words. This is a known mermaid bug — subgraph titles
+    // should never wrap. Use a large value to effectively disable wrapping, or read from config.
+    let cluster_title_wrapping_width =
+        config_f64(effective_config_value, &["flowchart", "wrappingWidth"]).unwrap_or(9999.0);
     // Mermaid flowchart-v2 uses the global `htmlLabels` toggle for *node* labels, while
     // subgraph titles + edge labels follow `flowchart.htmlLabels` (falling back to the global
     // toggle when unset).
