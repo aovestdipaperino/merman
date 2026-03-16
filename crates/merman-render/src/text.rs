@@ -4107,13 +4107,14 @@ fn vendored_measure_wrapped_impl(
         }
     };
 
+    let width = measurer.apply_scale(width);
     let metrics = TextMetrics {
         width,
         height,
         line_count: lines.len(),
     };
     let raw_width_px = if wrap_mode == WrapMode::HtmlLike {
-        raw_width_unscaled
+        raw_width_unscaled.map(|w| measurer.apply_scale(w))
     } else {
         None
     };
