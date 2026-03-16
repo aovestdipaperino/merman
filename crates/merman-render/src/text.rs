@@ -2778,6 +2778,28 @@ impl DeterministicTextMeasurer {
 #[derive(Debug, Clone, Default)]
 pub struct VendoredFontMetricsTextMeasurer {
     fallback: DeterministicTextMeasurer,
+    /// Optional width scale factor applied to all text measurements.
+    /// Useful for fonts wider than the vendored metrics tables (e.g. Virgil ≈ 1.2×).
+    /// A value of 0.0 (the default) means no scaling.
+    pub width_scale: f64,
+}
+
+impl VendoredFontMetricsTextMeasurer {
+    /// Create a measurer with a width scale factor for wider fonts.
+    pub fn with_width_scale(scale: f64) -> Self {
+        Self {
+            width_scale: scale,
+            ..Default::default()
+        }
+    }
+
+    fn apply_scale(&self, width: f64) -> f64 {
+        if self.width_scale > 0.0 {
+            width * self.width_scale
+        } else {
+            width
+        }
+    }
 }
 
 impl VendoredFontMetricsTextMeasurer {
@@ -4125,6 +4147,7 @@ impl TextMeasurer for VendoredFontMetricsTextMeasurer {
                 font_size,
             ));
         }
+        let width = self.apply_scale(width);
         if width.is_finite() && width >= 0.0 {
             width
         } else {
@@ -4145,7 +4168,7 @@ impl TextMeasurer for VendoredFontMetricsTextMeasurer {
             left = left.max(l);
             right = right.max(r);
         }
-        (left, right)
+        (self.apply_scale(left), self.apply_scale(right))
     }
 
     fn measure_svg_text_bbox_x_with_ascii_overhang(
@@ -4169,7 +4192,7 @@ impl TextMeasurer for VendoredFontMetricsTextMeasurer {
             left = left.max(l);
             right = right.max(r);
         }
-        (left, right)
+        (self.apply_scale(left), self.apply_scale(right))
     }
 
     fn measure_svg_title_bbox_x(&self, text: &str, style: &TextStyle) -> (f64, f64) {
