@@ -12,6 +12,10 @@ pub(in crate::svg::parity) fn flowchart_label_html(
         return String::new();
     }
 
+    // Mermaid's common.sanitizeText converts literal `\n` sequences to `<br/>`.
+    // The parser preserves them verbatim; convert here at render time.
+    let label = &label.replace("\\n", "<br/>");
+
     fn xhtml_fix_fragment(input: &str) -> String {
         // `foreignObject` content lives in an XML document, so:
         // - void tags must be self-closed (`<br />`, not `<br>`)

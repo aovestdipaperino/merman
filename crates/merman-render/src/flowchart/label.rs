@@ -13,6 +13,10 @@ pub(crate) fn flowchart_label_metrics_for_layout(
     config: &MermaidConfig,
     math_renderer: Option<&(dyn MathRenderer + Send + Sync)>,
 ) -> crate::text::TextMetrics {
+    // Mermaid's sanitizeText converts literal `\n` to `<br/>` before measurement.
+    let label_converted = raw_label.replace("\\n", "<br/>");
+    let raw_label = label_converted.as_str();
+
     let math_metrics = if wrap_mode == WrapMode::HtmlLike && raw_label.contains("$$") {
         // Upstream Mermaid measures KaTeX-rendered HTML labels via DOM. Keep pure-Rust as the
         // default behavior, but allow an optional backend to override label metrics.
